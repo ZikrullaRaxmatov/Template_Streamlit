@@ -46,7 +46,7 @@ st.sidebar.markdown("""
         </a>
     </div>
 """, unsafe_allow_html=True)
-
+#Slaom
 
 # Main title (keeps default)
 st.title("Medical Diagnosis")
