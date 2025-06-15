@@ -54,13 +54,57 @@ st.title("Medical Diagnosis")
 if page == "Home":
     st.markdown('<h2 class="main-header">Welcome to the <em>RZR.AI</em> Medical Diagnosis</h2>', unsafe_allow_html=True)
     st.write("Use the sidebar to navigate to different sections.")
-    
     st.image("https://keck.usc.edu/news/wp-content/uploads/sites/68/2023/09/ai-in-medicine-target.jpg", caption="Virus detector")
     
 elif page == "Brain Cancer":
     st.markdown('<h2 class="main-header">Brain Cancer Detection</h2>', unsafe_allow_html=True)
     st.write("Brain cancer refers to the abnormal growth of cells in the brain. Early diagnosis and treatment are crucial.")
-    st.file_uploader("Upload Brain MRI", type=["jpg", "png", "jpeg"])
+    
+    img = st.file_uploader("Upload Brain MRI", type=["jpg", "png", "jpeg"])
+    
+    if img:
+
+        class_names = {
+            0 : 'Brain Glioma',
+            1 : 'Brain Menin',
+            2 : 'Brain Tumor'
+        }
+
+        # Load the image
+        uploaded_img = Image.open(img)
+
+        # Use transformation
+        input_tensor = test_transform(uploaded_img)
+
+        # Add a batch dimension
+        input_batch = input_tensor.unsqueeze(0)
+
+        # Move the input to the device
+        device = torch.device("cpu")
+        input_batch = input_batch.to(device)
+
+        # Load the trained model
+        best_model = CNN()
+        best_model.load_state_dict(torch.load('best_model4.pt', map_location=torch.device('cpu')))
+        best_model.to(device)
+
+        best_model.eval()  # Set the model to evaluation mode
+
+        # Get the model's output
+        with torch.no_grad():
+            output = best_model(input_batch)
+
+        # Interpret the output
+        _, predicted_class = torch.max(output, 1)
+        class_index = predicted_class.item()
+
+        st.image(
+            uploaded_img,
+            caption= class_names[class_index],
+            width=400,
+            channels="RGB"
+        )
+
 
 elif page == "X RAY":
     st.markdown('<h2 class="main-header">Chest X-RAY Analysis</h2>', unsafe_allow_html=True)
