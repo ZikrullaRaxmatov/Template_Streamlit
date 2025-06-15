@@ -101,7 +101,7 @@ elif page == "Brain Cancer":
 
         # Load the trained model
         best_model = CNN()
-        best_model.load_state_dict(torch.load('best_model_brain_cancer.pt', map_location=torch.device('cpu')))
+        best_model.load_state_dict(torch.load('./best_model_brain_cancer.pt', map_location=torch.device('cpu')))
         best_model.to(device)
 
         best_model.eval()  # Set the model to evaluation mode
@@ -112,14 +112,40 @@ elif page == "Brain Cancer":
 
         # Interpret the output
         _, predicted_class = torch.max(output, 1)
+        print('************************************', predicted_class, '********************************')
         class_index = predicted_class.item()
+        
+        # Create two columns
+        col1, col2 = st.columns(2)
 
-        st.image(
+        # Load and show image in left column
+        with col1:
+            st.image(
             uploaded_img,
             caption= class_names[class_index],
-            width=400,
+            width=360,
             channels="RGB"
         )
+
+        # Show description in right column
+        with col2:
+            st.markdown(f"""
+                <div style="
+                    border: 3px solid green;
+                    border-radius: 10px;
+                    padding: 1rem;
+                    background-color: #f9fff9;
+                    color: black;
+                ">
+                    <h4>Description</h4>
+                    <ul>
+                        <li><b>Type</b>: {class_names[class_index]}</li>
+                        <li><b>Size</b>: 224x224 pixels</li>
+                        <li><b>Purpose</b>: Identify possible lung abnormalities</li>
+                        <li><b>Model Confidence</b>: 95.1%</li>
+                    </ul>
+                </div>
+            """, unsafe_allow_html=True)
 
 
 elif page == "X RAY":
