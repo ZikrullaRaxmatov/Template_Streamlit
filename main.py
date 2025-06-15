@@ -1,4 +1,9 @@
+import torch
 import streamlit as st
+
+from PIL import Image
+from ml_models import CNN
+from torchvision import transforms
 
 # Inject CSS for h2 with gradient
 st.markdown("""
@@ -50,6 +55,17 @@ st.sidebar.markdown("""
 # Main title (keeps default)
 st.title("Medical Diagnosis")
 
+# Apply transformations
+img_width, img_height = 180, 180
+batch_size = 64
+
+test_transform = transforms.Compose([
+    transforms.Resize((img_width, img_height)),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.495, 0.455, 0.432],
+                        std=[0.299, 0.225, 0.256])
+])
+
 # Page content
 if page == "Home":
     st.markdown('<h2 class="main-header">Welcome to the <em>RZR.AI</em> Medical Diagnosis</h2>', unsafe_allow_html=True)
@@ -85,7 +101,7 @@ elif page == "Brain Cancer":
 
         # Load the trained model
         best_model = CNN()
-        best_model.load_state_dict(torch.load('best_model4.pt', map_location=torch.device('cpu')))
+        best_model.load_state_dict(torch.load('best_model_brain_cancer.pt', map_location=torch.device('cpu')))
         best_model.to(device)
 
         best_model.eval()  # Set the model to evaluation mode
