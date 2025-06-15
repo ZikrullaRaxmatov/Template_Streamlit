@@ -1,4 +1,4 @@
-import torchvision
+from torchvision import transforms
 
 
 # Apply transformations
