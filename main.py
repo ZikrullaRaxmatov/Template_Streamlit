@@ -71,3 +71,4 @@ elif page == "Melanoma":
     st.markdown('<h2 class="main-header">Melanoma Skin Cancer Detection</h2>', unsafe_allow_html=True)
     st.write("Melanoma is a serious form of skin cancer that begins in melanocytes.")
     st.file_uploader("Upload Skin Image", type=["jpg", "png", "jpeg"])
+# Salom hammaga
