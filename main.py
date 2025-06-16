@@ -1,9 +1,8 @@
-import torch
 import streamlit as st
 
 from PIL import Image
-from ml_models import CNN
-from torchvision import transforms
+from predictions import predict_result
+from utils import result_card
 
 # Inject CSS for h2 with gradient
 st.markdown("""
@@ -55,17 +54,6 @@ st.sidebar.markdown("""
 # Main title (keeps default)
 st.title("Medical Diagnosis")
 
-# Apply transformations
-img_width, img_height = 180, 180
-batch_size = 64
-
-test_transform = transforms.Compose([
-    transforms.Resize((img_width, img_height)),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.495, 0.455, 0.432],
-                        std=[0.299, 0.225, 0.256])
-])
-
 # Page content
 if page == "Home":
     st.markdown('<h2 class="main-header">Welcome to the <em>RZR.AI</em> Medical Diagnosis</h2>', unsafe_allow_html=True)
@@ -88,64 +76,10 @@ elif page == "Brain Cancer":
 
         # Load the image
         uploaded_img = Image.open(img)
-
-        # Use transformation
-        input_tensor = test_transform(uploaded_img)
-
-        # Add a batch dimension
-        input_batch = input_tensor.unsqueeze(0)
-
-        # Move the input to the device
-        device = torch.device("cpu")
-        input_batch = input_batch.to(device)
-
-        # Load the trained model
-        best_model = CNN()
-        best_model.load_state_dict(torch.load('./best_model_brain_cancer.pt', map_location=torch.device('cpu')))
-        best_model.to(device)
-
-        best_model.eval()  # Set the model to evaluation mode
-
-        # Get the model's output
-        with torch.no_grad():
-            output = best_model(input_batch)
-
-        # Interpret the output
-        _, predicted_class = torch.max(output, 1)
-        print('************************************', predicted_class, '********************************')
-        class_index = predicted_class.item()
         
-        # Create two columns
-        col1, col2 = st.columns(2)
-
-        # Load and show image in left column
-        with col1:
-            st.image(
-            uploaded_img,
-            caption= class_names[class_index],
-            width=360,
-            channels="RGB"
-        )
-
-        # Show description in right column
-        with col2:
-            st.markdown(f"""
-                <div style="
-                    border: 3px solid green;
-                    border-radius: 10px;
-                    padding: 1rem;
-                    background-color: #f9fff9;
-                    color: black;
-                ">
-                    <h4>Description</h4>
-                    <ul>
-                        <li><b>Type</b>: {class_names[class_index]}</li>
-                        <li><b>Size</b>: 224x224 pixels</li>
-                        <li><b>Purpose</b>: Identify possible lung abnormalities</li>
-                        <li><b>Model Confidence</b>: 95.1%</li>
-                    </ul>
-                </div>
-            """, unsafe_allow_html=True)
+        class_index, confidence = predict_result(uploaded_img)
+        
+        result_card(uploaded_img, class_names, class_index, confidence)
 
 
 elif page == "X RAY":
