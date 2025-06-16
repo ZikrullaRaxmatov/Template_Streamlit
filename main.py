@@ -1,7 +1,7 @@
 import streamlit as st
 
 from PIL import Image
-from predictions import predict_result
+from predictions import prediction_result
 from utils import result_card
 
 # Inject CSS for h2 with gradient
@@ -76,8 +76,9 @@ elif page == "Brain Cancer":
 
         # Load the image
         uploaded_img = Image.open(img)
+        best_model_path = './best_model_brain_cancer.pt'
         
-        class_index, confidence = predict_result(uploaded_img)
+        class_index, confidence = prediction_result(uploaded_img, best_model_path)
         
         result_card(uploaded_img, class_names, class_index, confidence)
 
@@ -85,9 +86,41 @@ elif page == "Brain Cancer":
 elif page == "X RAY":
     st.markdown('<h2 class="main-header">Chest X-RAY Analysis</h2>', unsafe_allow_html=True)
     st.write("X-rays are used to detect issues like pneumonia, tuberculosis, and other lung diseases.")
-    st.file_uploader("Upload Chest X-RAY Image", type=["jpg", "png", "jpeg"])
+    img = st.file_uploader("Upload Chest X-RAY Image", type=["jpg", "png", "jpeg"])
+    
+    if img:
+
+        class_names = {
+            0 : 'Brain Glioma',
+            1 : 'Brain Menin',
+            2 : 'Brain Tumor'
+        }
+
+        # Load the image
+        uploaded_img = Image.open(img)
+        best_model_path = './best_model_brain_cancer.pt'
+        
+        class_index, confidence = prediction_result(uploaded_img, best_model_path)
+        
+        result_card(uploaded_img, class_names, class_index, confidence)
+
 
 elif page == "Melanoma":
     st.markdown('<h2 class="main-header">Melanoma Skin Cancer Detection</h2>', unsafe_allow_html=True)
     st.write("Melanoma is a serious form of skin cancer that begins in melanocytes.")
-    st.file_uploader("Upload Skin Image", type=["jpg", "png", "jpeg"])
+    img = st.file_uploader("Upload Skin Image", type=["jpg", "png", "jpeg"])
+
+    if img:
+
+        class_names = {
+            0 : 'Benign',
+            1 : 'Malignant',
+        }
+
+        # Load the image
+        uploaded_img = Image.open(img)
+        best_model_path = './best_model_melanoma.pt'
+        
+        class_index, confidence = prediction_result(uploaded_img, best_model_path)
+        
+        result_card(uploaded_img, class_names, class_index, confidence)
